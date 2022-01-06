@@ -35,13 +35,13 @@ module park_space_number(
 			else
 				case (parking_capacity)
 					8'b00000001: park_number = 3'b000;
-					8'b00000010: park_number = 3'b001;
-					8'b00000100: park_number = 3'b010;
-					8'b00001000: park_number = 3'b011;
-					8'b00010000: park_number = 3'b100;
-					8'b00100000: park_number = 3'b101;
-					8'b01000000: park_number = 3'b110;
-					8'b10000000: park_number = 3'b111;
+					8'b0000001x: park_number = 3'b001;
+					8'b000001xx: park_number = 3'b010;
+					8'b00001xxx: park_number = 3'b011;
+					8'b0001xxxx: park_number = 3'b100;
+					8'b001xxxxx: park_number = 3'b101;
+					8'b01xxxxxx: park_number = 3'b110;
+					8'b1xxxxxxx: park_number = 3'b111;
 					default: park_number =3'bxxx;
 				endcase
 		end
