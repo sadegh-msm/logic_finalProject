@@ -19,66 +19,66 @@
 -----------------------------------------------------------*/
 `timescale 1 ns/1 ns
 
-module half_adder(
-	input a,
-	input b,
-	output c,
-	output s);
-	
-	xor x(s, a, b);
-	and a(c, a, b);
+module one_bit_full_adder(
+	Sum,
+	Cout,
+	A,
+	B,
+	Cin);
 
-endmodule
-
-
-module full_adder(
-	input a,
-	input b,
-	input cin,
-	output s,
-	output cout);
+	output Sum,Cout;
+	input A, B, Cin;
 	
-	wire carryg, carryp, sum1;
+	wire t1, t2, t3;
 	
-	half_adder
-		ha1(.a(a), .b(b), .c(carryg), .s(sum1)),
-		ha2(.a(sum1), .b(cin), .c(carryp), .s(s));
-		
-	or o(cout, carryp, carryg);
+	assign #10 t1= A ^ B;
+	assign #5 t2= A & B;
+	assign #5 t3= Cin & t1;
+	
+	assign #10 Sum = t1^Cin;
+	assign #5 Cout= t2 | t3;
 	
 endmodule
 
 
-module ripple_carry(
-	input cin,
-	input [3:0] a,
-	input [3:0] b,
-	output [3:0] s,
-	output cout);
+module one_bit_adder_subtractor(
+	Sum,
+	Cout,
+	A,
+	B,
+	Sel,
+	Cin);
 	
-	wire cout0, cout1, cout2;
-	full_adder
-		fa1(a[0], b[0], cin, s[0], cout0),
-		fa2(a[1], b[1], cout0, s[1], cout1),
-		fa3(a[2], b[2], cout1, s[2], cout2),
-		fa4(a[3], b[3], cout2, s[3], cout);
-
+	output Sum,Cout;
+	input A, B, Sel, Cin;
+	
+	wire Bs;
+	assign #10 Bs = B^Sel;
+	
+	one_bit_full_adder obfa(Sum, Cout, A, Bs, Cin);
+	
 endmodule
 
 
-module addder_8bit(
-    input cin,
-    input [7:0] a,
-    input [7:0] b,
-    output [7:0] s,
-    output cout);
-
-    wire cout3;
-	 
-    ripple_carry
-        rc1(cin, a[3:0], b[3:0], s[3:0], cout3),
-        rc2(cout3, a[7:4], b[7:4], s[7:4], cout);
-		  
+module four_bit_adder_subtractor(
+	Sum,
+	Cout,
+	A,
+	B,
+	Sel);
+	
+	output [3:0] Sum;
+	output Cout;
+	input [3:0] A;
+	input [3:0] B;
+	input Sel;
+	
+	wire carry[2:0];
+	one_bit_adder_subtractor obas1(Sum[0],carry[0],A[0],B[0],Sel,Sel),
+									 obas2(Sum[1],carry[1],A[1],B[1],Sel,carry[0]),
+									 obas3(Sum[2],carry[2],A[2],B[2],Sel,carry[1]),
+									 obas4(Sum[3],Cout,A[3],B[3],Sel,carry[2]);
+									 
 endmodule
 
 
@@ -90,21 +90,10 @@ module time_calculate(
 	input [7:0] time_out;
 	input [7:0] time_in;
 	output [7:0] time_total;
-	input bin;
-	output bout;
-	wire [7:0] e;
+	wire cout0;
+	wire cout1;
 	
-	xor
-        x0(e[0], time_in[0], bin),
-        x1(e[1], time_in[1], bin),
-        x2(e[2], time_in[2], bin),
-        x3(e[3], time_in[3], bin),
-        x4(e[4], time_in[4], bin),
-        x5(e[5], time_in[5], bin),
-        x6(e[6], time_in[6], bin),
-        x7(e[7], time_in[7], bin);
-
-	addder_8bit
-        a8(bin, time_out[7:0], e, time_total[7:0], bout);
-
+	four_bit_adder_subtractor fbastc1(time_total[3:0], cout0, time_out[3:0], time_in[3:0], 1'b1),
+									  fbastc2(time_total[7:4], cout1, time_out[7:4], time_in[7:4], cout0);
+	
 endmodule

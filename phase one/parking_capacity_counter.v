@@ -19,69 +19,6 @@
 -----------------------------------------------------------*/
 `timescale 1 ns/1 ns
 
-module one_bit_full_adder(
-	S,
-	Cout,
-	A,
-	B,
-	Cin);
-
-	output S,Cout;
-	input A, B, Cin;
-	
-	wire t1, t2, t3;
-	
-	assign #10 t1= A^B;
-	assign #5 t2= A & B;
-	assign #5 t3= Cin & t1;
-	
-	assign #10 S = t1^Cin;
-	assign #5 Cout= t2 | t3;
-	
-endmodule
-
-
-module one_bit_adder_subtractor(
-	S,
-	Cout,
-	A,
-	B,
-	Sel,
-	Cin);
-	
-	output S,Cout;
-	input A, B, Sel, Cin;
-	
-	wire Bs;
-	assign #10 Bs = B^Sel;
-	
-	one_bit_full_adder obfa(S,Cout,A,Bs,Cin);
-	
-endmodule
-
-
-module four_bit_adder_subtractor(
-	S,
-	Cout,
-	A,
-	B,
-	Sel);
-	
-	output [3:0] S;
-	output Cout;
-	input [3:0] A;
-	input [3:0] B;
-	input Sel;
-	
-	wire carry[2:0];
-	one_bit_adder_subtractor obas1(S[0],carry[0],A[0],B[0],Sel,Sel),
-									 obas2(S[1],carry[1],A[1],B[1],Sel,carry[0]),
-									 obas3(S[2],carry[2],A[2],B[2],Sel,carry[1]),
-									 obas4(S[3],Cout,A[3],B[3],Sel,carry[2]);
-									 
-endmodule
-
-
 module parking_capacity_counter(
 	new_capacity,
 	parked,
@@ -100,14 +37,14 @@ module parking_capacity_counter(
 	wire [7:0] cout;
 	wire coutn;
 	
-	four_bit_adder_subtractor fbas1(s0, cout[0], 4'b0000, new_capacity[0], 1'b0),
-									  fbas2(s1, cout[1], s0, cout[0], 1'b0),
-									  fbas3(s2, cout[2], s1, cout[1], 1'b0),
-									  fbas4(s3, cout[3], s2, cout[2], 1'b0),
-									  fbas5(s4, cout[4], s3, cout[3], 1'b0),
-									  fbas6(s5, cout[5], s4, cout[4], 1'b0),
-									  fbas7(s6, cout[6], s5, cout[5], 1'b0),
-									  fbas8(empty, cout[7], s6, cout[6], 1'b0),
-									  fbas(parked, coutn, 4'b1111, empty, 1'b1);
+	four_bit_adder_subtractor fbas1(s0, cout[0], 4'b0000, {000, new_capacity[0]}, 1'b0),
+									  fbas2(s1, cout[1], s0, {000, new_capacity[1]}, cout[0]),
+									  fbas3(s2, cout[2], s1, {000, new_capacity[2]}, cout[1]),
+									  fbas4(s3, cout[3], s2, {000, new_capacity[3]}, cout[2]),
+									  fbas5(s4, cout[4], s3, {000, new_capacity[4]}, cout[3]),
+									  fbas6(s5, cout[5], s4, {000, new_capacity[5]}, cout[4]),
+									  fbas7(s6, cout[6], s5, {000, new_capacity[6]}, cout[5]),
+									  fbas8(empty, cout[7], s6, {000, new_capacity[7]}, cout[6]),
+									  fbas(parked, coutn, 4'b1000, empty, 1'b1);
 	
 endmodule
