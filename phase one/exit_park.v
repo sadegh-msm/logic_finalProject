@@ -28,9 +28,9 @@ module exit_park(
 	input [2:0] token;
 	input [2:0] pattern;
 	output [7:0] park_location;
-	reg [2:0] e;
+	wire [2:0] e;
 	
 	decrypt d(exit, token, pattern, e);
-	exit_parking_lot(e, park_location);
+	exit_parking_lot epl(e, park_location);
 	
 endmodule

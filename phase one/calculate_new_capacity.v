@@ -30,7 +30,7 @@ module calculate_new_capacity(
 
 	always @ (parking_capacity or park_location)
 	begin
-		assign new_capacity = park_location ^ parking_capacity;
+		new_capacity = park_location ^ parking_capacity;
 	end
 	
 endmodule
