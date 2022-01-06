@@ -28,22 +28,14 @@ module park_space_number(
 	input [7:0] parking_capacity;
 	output reg [2:0] park_number;
 	
-	always @ (parking_capacity, enable)
-		begin
-			if(enable == 0)
-				park_number =3'bzzz;
-			else
-				case (parking_capacity)
-					8'b00000001: park_number = 3'b000;
-					8'b0000001x: park_number = 3'b001;
-					8'b000001xx: park_number = 3'b010;
-					8'b00001xxx: park_number = 3'b011;
-					8'b0001xxxx: park_number = 3'b100;
-					8'b001xxxxx: park_number = 3'b101;
-					8'b01xxxxxx: park_number = 3'b110;
-					8'b1xxxxxxx: park_number = 3'b111;
-					default: park_number =3'bxxx;
-				endcase
-		end
+assign park_number = (parking_capacity[7] == 1'b1 & enable) ? 3'b111 :
+                (parking_capacity[6] == 1'b1 & enable) ? 3'b110 :
+                (parking_capacity[5] == 1'b1 & enable) ? 3'b101 :
+                (parking_capacity[4] == 1'b1 & enable) ? 3'b100 :
+                (parking_capacity[3] == 1'b1 & enable) ? 3'b011 :
+                (parking_capacity[2] == 1'b1 & enable) ? 3'b010 :
+                (parking_capacity[1] == 1'b1 & enable) ? 3'b001 :
+                (parking_capacity[0] == 1'b1 & enable) ? 3'b000 : 3'bzzz;
+    
 		
 endmodule
