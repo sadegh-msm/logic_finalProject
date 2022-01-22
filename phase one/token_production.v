@@ -31,7 +31,7 @@ module token_production(
 
 	always @ (pattern or park_number)
 		begin
-			assign token = park_number ^ pattern;
+			token = park_number ^ pattern;
 		end
 		
 endmodule
