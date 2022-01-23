@@ -25,6 +25,8 @@ module fsm (
 	input RST ,
 	input CLK ,
 	input confirm ,
+	input [2:0] user_token,
+	input [2:0] system_token,
 	output reg en_P ,
 	output reg en_Q);
 
@@ -41,8 +43,8 @@ module fsm (
             A: if (~request) Nxtstate = A;
 					 else if (request) Nxtstate = B;	 
 					 
-            B: if (request & ~confirm) Nxtstate = E;  
-                else if(request & confirm) Nxtstate = C;
+            B: if (request & ~confirm & user_token != system_token) Nxtstate = E;  
+                else if(request & confirm & user_token == system_token) Nxtstate = C;
 					 else if(~request) Nxtstate = A;
 
             C: if(~request) Nxtstate = A;  
@@ -69,12 +71,12 @@ module fsm (
 				end
             D: begin
 				if (time_data == 8'b1111xxxx) begin
-				en_P = 1'b1;
-				en_Q = 1'b0;
-				end
-				else begin 
 				en_P = 1'b0;
 				en_Q = 1'b1;
+				end
+				else begin 
+				en_P = 1'b1;
+				en_Q = 1'b0;
 				end
 				end
 	         endcase
@@ -96,7 +98,7 @@ module controller(
 	wire en_Q;
 	wire en_P;
 	
-	fsm fsm1(request, TimeData, reset, clock, confirm, en_P, en_Q);
+	fsm fsm1(request, TimeData, reset, clock, confirm, user_token, system_token, en_P, en_Q);
 	register r1(TimeData, clock, reset, en_P, data_P);
 	register r2(TimeData, clock, reset, en_Q, data_Q);
 	

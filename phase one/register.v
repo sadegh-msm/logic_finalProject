@@ -29,7 +29,7 @@ module register(
 	always @(posedge CLK)
 		if (~RST)
 		begin
-			Q <= 8'b0;
+			Q <= 8'b00000000;
 		end else if (en) 
 		begin
 			Q <= D;

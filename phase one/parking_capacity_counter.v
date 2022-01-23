@@ -37,14 +37,14 @@ module parking_capacity_counter(
 	wire [7:0] cout;
 	wire coutn;
 	
-	four_bit_adder_subtractor fbas1(s0, cout[0], 4'b0000, {000, new_capacity[0]}, 1'b0),
-									  fbas2(s1, cout[1], s0, {000, new_capacity[1]}, cout[0]),
-									  fbas3(s2, cout[2], s1, {000, new_capacity[2]}, cout[1]),
-									  fbas4(s3, cout[3], s2, {000, new_capacity[3]}, cout[2]),
-									  fbas5(s4, cout[4], s3, {000, new_capacity[4]}, cout[3]),
-									  fbas6(s5, cout[5], s4, {000, new_capacity[5]}, cout[4]),
-									  fbas7(s6, cout[6], s5, {000, new_capacity[6]}, cout[5]),
-									  fbas8(empty, cout[7], s6, {000, new_capacity[7]}, cout[6]),
-									  fbas(parked, coutn, 4'b1000, empty, 1'b1);
+	four_bit_adder_subtractor fbas1(4'b0000, {000, new_capacity[0]}, 1'b0, cout[0], s0),
+									  fbas2(s0, {000, new_capacity[1]}, cout[0], cout[1], s1),
+									  fbas3(s1, {000, new_capacity[2]}, cout[1], cout[2], s2),
+									  fbas4(s2, {000, new_capacity[3]}, cout[2], cout[3], s3),
+									  fbas5(s3, {000, new_capacity[4]}, cout[3], cout[4], s4),
+									  fbas6(s4, {000, new_capacity[5]}, cout[4], cout[5], s5),
+									  fbas7(s5, {000, new_capacity[6]}, cout[5], cout[6], s6),
+									  fbas8(s6, {000, new_capacity[7]}, cout[6], cout[7], empty),
+									  fbas(4'b1000, empty, 1'b1, cout[7], parked);
 	
 endmodule

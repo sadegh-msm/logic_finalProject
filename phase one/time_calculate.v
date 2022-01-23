@@ -20,65 +20,74 @@
 `timescale 1 ns/1 ns
 
 module one_bit_full_adder(
-	Sum,
-	Cout,
-	A,
-	B,
-	Cin);
-
-	output Sum,Cout;
-	input A, B, Cin;
-	
-	wire t1, t2, t3;
-	
-	assign #10 t1= A ^ B;
-	assign #5 t2= A & B;
-	assign #5 t3= Cin & t1;
-	
-	assign #10 Sum = t1^Cin;
-	assign #5 Cout= t2 | t3;
-	
+	bit1,
+	bit2,
+	cin,
+	sum,
+	cout
+    );
+	 
+	input bit1;
+	input bit2;
+	input cin;
+	output sum;
+	output cout;
+ 
+	wire w1, w2, w3;
+  
+	xor g1(w1, bit1, bit2);
+	and g2(w2, w1, cin),
+		g3(w3, bit1, bit2);
+ 
+	xor g4(sum, w1, cin);
+	or g5(cout, w2, w3);
 endmodule
 
 
 module one_bit_adder_subtractor(
-	Sum,
-	Cout,
-	A,
-	B,
-	Sel,
-	Cin);
-	
-	output Sum,Cout;
-	input A, B, Sel, Cin;
-	
-	wire Bs;
-	assign #10 Bs = B^Sel;
-	
-	one_bit_full_adder obfa(Sum, Cout, A, Bs, Cin);
-	
-endmodule
+	bit1,
+	bit2,
+	selector,
+	cin,
+	sum,
+	cout
+    );
+	 
+  input bit1;
+  input bit2;
+  input selector;
+  input cin;
+  output sum;
+  output cout;
+  
+  wire w;
+  xor g1 (w, bit2, selector);
+  one_bit_full_adder f(bit1, w, cin, sum, cout);
+  
+  endmodule
 
 
 module four_bit_adder_subtractor(
-	Sum,
-	Cout,
-	A,
-	B,
-	Sel);
-	
-	output [3:0] Sum;
-	output Cout;
-	input [3:0] A;
-	input [3:0] B;
-	input Sel;
-	
-	wire carry[2:0];
-	one_bit_adder_subtractor obas1(Sum[0],carry[0],A[0],B[0],Sel,Sel),
-									 obas2(Sum[1],carry[1],A[1],B[1],Sel,carry[0]),
-									 obas3(Sum[2],carry[2],A[2],B[2],Sel,carry[1]),
-									 obas4(Sum[3],Cout,A[3],B[3],Sel,carry[2]);
-									 
+    num1,
+	 num2,
+	 selector,
+	 cout,
+	 sum
+    );
+	 
+	 input [3:0] num1;
+	 input [3:0] num2;
+	 input selector;
+	 output cout;
+	 output [3:0] sum;
+	 
+	  wire c1, c2, c3;
+	 one_bit_adder_subtractor a1(.bit1(num1[0]), .bit2(num2[0]), .selector(selector), .cin(selector), .sum(sum[0]), .cout(c1));
+	 one_bit_adder_subtractor a2(.bit1(num1[1]), .bit2(num2[1]), .selector(selector), .cin(c1), .sum(sum[1]), .cout(c2));
+	 one_bit_adder_subtractor a3(.bit1(num1[2]), .bit2(num2[2]), .selector(selector), .cin(c2), .sum(sum[2]), .cout(c3));
+	 one_bit_adder_subtractor a4(.bit1(num1[3]), .bit2(num2[3]), .selector(selector), .cin(c3), .sum(sum[3]), .cout(cout));
+
+
 endmodule
 
 
@@ -93,7 +102,7 @@ module time_calculate(
 	wire cout0;
 	wire cout1;
 	
-	four_bit_adder_subtractor fbastc1(time_total[3:0], cout0, time_out[3:0], time_in[3:0], 1'b1),
-									  fbastc2(time_total[7:4], cout1, time_out[7:4], time_in[7:4], cout0);
+	four_bit_adder_subtractor fbastc1(time_out[3:0], time_in[3:0], 1'b1, cout0, time_total[3:0]),
+									  fbastc2(time_out[7:4], time_in[7:4], cout0, cout1, time_total[7:4]);
 	
 endmodule
