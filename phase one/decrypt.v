@@ -28,11 +28,8 @@ module decrypt(
 	input exit;
 	input [2:0] token;
 	input [2:0] pattern;
-	output reg [2:0] park_number;
+	output [2:0] park_number;
 	
-	always @ (pattern or exit or token)
-	begin
-		park_number = pattern ^ token;
-	end
+	assign park_number = exit==1'b1 ? pattern ^ token : 3'bzzz;
 	
 endmodule
